@@ -26,10 +26,5 @@ namespace Dwin.T5L.Communication.Tests
             var res = dm.ReadStringFromMemory(0x5000, (UInt16)(incoming.Length * 2), Encoding.BigEndianUnicode);
             Assert.Equal(res, result);
         }
-
-        public void Dispose()
-        {
-            
-        }
     }
 }

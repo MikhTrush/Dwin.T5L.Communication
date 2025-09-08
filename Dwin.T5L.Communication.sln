@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dwin.T5L.Communication.Test
 		{7A29CCBF-4541-4D08-8D14-5E7E6EA4F070} = {7A29CCBF-4541-4D08-8D14-5E7E6EA4F070}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dwin.T5L.Communication.LiveTests", "Dwin.T5L.Communication.LiveTests\Dwin.T5L.Communication.LiveTests.csproj", "{46688D0E-840A-46B9-8ED9-94981681B9BB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,6 +26,10 @@ Global
 		{9B39B987-D84E-40ED-A9A0-5C3F31B02FD2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9B39B987-D84E-40ED-A9A0-5C3F31B02FD2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9B39B987-D84E-40ED-A9A0-5C3F31B02FD2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{46688D0E-840A-46B9-8ED9-94981681B9BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{46688D0E-840A-46B9-8ED9-94981681B9BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{46688D0E-840A-46B9-8ED9-94981681B9BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{46688D0E-840A-46B9-8ED9-94981681B9BB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
