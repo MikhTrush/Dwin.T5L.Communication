@@ -8,12 +8,12 @@ namespace Dwin.T5L.Communication;
 /// Provides a high-level interface for interacting with a DWIN HMI display based on the T5L chip.
 /// This class encapsulates the underlying protocol communication and memory management.
 /// </summary>
-public class DwinT5LDisplay : IDisposable
+public class DwinT5LDisplay : IDwinT5LDisplay, IDisposable
 {
     private readonly SerialPort _serialPort;
     private readonly IDwinProtocol _protocol;
     private readonly IDwinMemory _memory;
-    private bool _isDisposed = false;
+    private bool _isDisposed;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DwinT5LDisplay"/> class.
@@ -24,8 +24,8 @@ public class DwinT5LDisplay : IDisposable
     public DwinT5LDisplay(SerialPort serialPort, IDwinProtocol? protocol = null, IDwinMemory? memory = null)
     {
         _serialPort = serialPort ?? throw new ArgumentNullException(nameof(serialPort));
-        if (!_serialPort.IsOpen)
-            throw new ArgumentException("SerialPort must be open.", nameof(serialPort));
+        
+        _serialPort.Open(); // Ensure the port is open
 
         var locker = new object();
 
@@ -107,14 +107,17 @@ public class DwinT5LDisplay : IDisposable
     {
         ObjectDisposedException.ThrowIf(_isDisposed, this);
         // Similar logic: Prepare data in _memory, send via _protocol
-        _memory.WriteUInt16AsBEbytesToMemory(DwinDisplayConstants.PageNumberAddress, pageId); // Assume you define common addresses like PageNumberAddress
-        byte[] dataToSend = _memory.ReadDataFromMemoryAsBytes(DwinDisplayConstants.PageNumberAddress, 1);
+        _memory.WriteDataToMemoryBEbytes(DwinDisplayConstants.PageNumberAddress, [0x5a, 0x1, (byte)(pageId >> 8), (byte)pageId]); // Assume you define common addresses like PageNumberAddress
+        byte[] dataToSend = _memory.ReadDataFromMemoryAsBytes(DwinDisplayConstants.PageNumberAddress, 2);
+
+        //Console.WriteLine(BitConverter.ToString(dataToSend));
+
         _protocol.SendWritingCommand(DwinDisplayConstants.PageNumberAddress, dataToSend, _serialPort);
         var response = _protocol.WaitForDwinMessage(_serialPort);
         _protocol.ProcessAnswer(response, _memory.WriteDataToMemoryBEbytes);
     }
 
-    public void GoToPageBack()
+    public void GoToPreviousPage()
     {
         ObjectDisposedException.ThrowIf(_isDisposed, this);
         
@@ -166,6 +169,16 @@ public class DwinT5LDisplay : IDisposable
         return result;
     }
     // Consider adding asynchronous versions (e.g., SetVariableAsync) if needed for responsiveness in certain applications.
+
+    public void ClearMemory(UInt16 address, ushort length)
+    {
+        ushort[] arr = [.. Enumerable.Repeat<ushort>(0, 120)];
+
+        for (ushort i = address; i < (ushort)(length + address); i += 120)
+        {
+            WriteVariablesRange(i, arr);
+        }
+    }
 
     #region IDisposable
     protected virtual void Dispose(bool disposing)

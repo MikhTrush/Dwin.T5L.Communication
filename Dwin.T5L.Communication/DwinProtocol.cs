@@ -25,6 +25,21 @@ public class DwinProtocol : IDwinProtocol
     private static readonly byte[] WriteAnswerBytes = [0x4F, 0x4B];
     private readonly int MinDataLength = 5;
 
+    private int _timeout;
+    private int _retries;
+
+    public DwinProtocol()
+    {
+        _timeout = 200;
+        _retries = 3;
+    }
+
+    public DwinProtocol(int timeout, int retries)
+    {
+        _timeout = timeout;
+        _retries = retries;
+    }
+
     public void SendWritingCommand(UInt16 address, byte[] data, SerialPort serialPort)
     {
         if (data == null)
@@ -68,7 +83,7 @@ public class DwinProtocol : IDwinProtocol
         return sequence.ToArray();
     }
 
-    public void ProcessAnswer(byte[] answer, Action<ushort, byte[]> WriteDataToMemory)
+    public bool ProcessAnswer(byte[] answer, Action<ushort, byte[]> WriteDataToMemory)
     {
         if (answer == null)
             throw new ArgumentNullException(nameof(answer), "Answer buffer cannot be null.");
@@ -87,11 +102,12 @@ public class DwinProtocol : IDwinProtocol
         {
             if (!TryProcessWriteAnswer(packet))
                 throw new InvalidDataException("Ответ на запись не соответствует ожидаемому (write answer does not match expected).");
-            return;
+            return true ;
         }
         // Note: WriteDataToMemoryBEbytes must be thread-safe if used in multi-threaded scenarios.
         if (!TryProcessReadAnswer(packet, WriteDataToMemory))
             throw new InvalidDataException("Ответ на чтение не соответствует ожидаемому (read answer does not match expected).");
+        return true;
     }
 
     private static void CheckCrc(ReadOnlySpan<byte> packet)
@@ -187,11 +203,11 @@ public class DwinProtocol : IDwinProtocol
     /// <returns>The full DWIN message as a <see cref="byte[]"/> (including header and all data).</returns>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="port"/> is null.</exception>
     /// <exception cref="TimeoutException">Thrown if no valid message is received after all retries.</exception>
-    public byte[] WaitForDwinMessage(SerialPort port, int timeoutMs = 500, int maxRetries = 2)
-    {
-        if (port == null)
-            throw new ArgumentNullException(nameof(port));
+    /// 
 
+    public byte[] WaitForDwinMessage(SerialPort port, int timeoutMs, int maxRetries)
+    {
+        ArgumentNullException.ThrowIfNull(port);
 
         int retries = 0;
         var stopwatch = new Stopwatch();
@@ -264,5 +280,10 @@ public class DwinProtocol : IDwinProtocol
             retries++;
         }
         throw new TimeoutException($"Timeout waiting for DWIN message after {maxRetries + 1} attempts.");
+    }
+
+    public byte[] WaitForDwinMessage(SerialPort port)
+    {
+        return WaitForDwinMessage(port, _timeout, _retries);
     }
 }

@@ -12,15 +12,15 @@ public class DwinMemory : IDwinMemory
     //Everything in memory should be in big-endian format, but we will convert it to little-endian if necessary
     public Memory<UInt16> Memory { get; } = new UInt16[0xFFFF];
     private readonly int MaxMessageLength = 128;
-    public readonly object obj;
-    public readonly bool IsLittleEndian = BitConverter.IsLittleEndian;
+    private readonly object obj;
+    private readonly bool IsLittleEndian = BitConverter.IsLittleEndian;
 
     public DwinMemory(object locker)
     {
         obj = locker ?? throw new ArgumentNullException(nameof(locker));
     }
 
-    public IDwinMemory CreateDwinMemory(object locker)
+    public static IDwinMemory CreateDwinMemory(object locker)
     {
         return new DwinMemory(locker);
     }
@@ -152,7 +152,7 @@ public class DwinMemory : IDwinMemory
         }
     }
 
-    private void Log(string str)
+    private static void Log(string str)
     {
         Console.WriteLine(str);
     }
