@@ -10,7 +10,7 @@
     <Authors>mikhtrush</Authors>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <AnalysisLevel>latest-recommended</AnalysisLevel>
-	  <Version>1.1.0</Version>
+    <Version>1.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
