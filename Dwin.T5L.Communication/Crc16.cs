@@ -77,7 +77,7 @@ public static class Crc16
     public static bool IsCrcCorrect(byte[] receivedData, byte[] crc)
     {
         if (crc.Length != 2)
-            throw new ArgumentException();
+            throw new ArgumentException("Crc length should be 2");
         return ComputeCheckSum(receivedData) == (UInt16)(crc[1] << 8 | crc[0]);
     }
 }

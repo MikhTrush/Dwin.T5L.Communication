@@ -27,11 +27,11 @@ public interface IDwinProtocol
     public void SendReadingCommand(UInt16 address, byte length, SerialPort serialPort);
     
     /// <summary>
-    /// Applies 
+    /// Applies Action to perform on correct data
     /// </summary>
     /// <param name="answer">Received Data</param>
     /// <param name="WriteDataToMemory">Action to perform on correct data</param>
-    public void ProcessAnswer(byte[] answer, Action<ushort, byte[]> WriteDataToMemory);
+    public bool ProcessAnswer(byte[] answer, Action<ushort, byte[]> WriteDataToMemory);
    
 
     /// <summary>
@@ -59,5 +59,6 @@ public interface IDwinProtocol
     /// <returns>The full DWIN message as a <see cref="byte[]"/> (including header and all data).</returns>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="port"/> is null.</exception>
     /// <exception cref="TimeoutException">Thrown if no valid message is received after all retries.</exception>
-    public byte[] WaitForDwinMessage(SerialPort port, int timeoutMs = 500, int maxRetries = 2);
+    public byte[] WaitForDwinMessage(SerialPort port, int timeoutMs, int maxRetries);
+    public byte[] WaitForDwinMessage(SerialPort port);
 }
