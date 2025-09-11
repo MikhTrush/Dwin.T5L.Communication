@@ -1,0 +1,24 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+	],
+	"settings": {
+		"files.exclude": {
+			"**/target": true, 
+			"**/.gitignore": true,
+			"**/bin": true,
+			"**/obj": true,
+			"**/.vs": true
+		},
+		"editor.formatOnSave": true,
+	},
+	"extensions": {
+		"recommendations": [
+			"ms-dotnettools.csdevkit",
+			"ms-dotnettools.csharp",
+			"ms-dotnettools.vscodeintellicode-csharp",
+		]
+	}
+}
