@@ -24,7 +24,7 @@ public class DwinT5LDisplay : IDwinT5LDisplay, IDisposable
     public DwinT5LDisplay(SerialPort serialPort, IDwinProtocol? protocol = null, IDwinMemory? memory = null)
     {
         _serialPort = serialPort ?? throw new ArgumentNullException(nameof(serialPort));
-        
+
         _serialPort.Open(); // Ensure the port is open
 
         var locker = new object();
@@ -120,7 +120,7 @@ public class DwinT5LDisplay : IDwinT5LDisplay, IDisposable
     public void GoToPreviousPage()
     {
         ObjectDisposedException.ThrowIf(_isDisposed, this);
-        
+
     }
 
     /// <summary>
@@ -177,6 +177,35 @@ public class DwinT5LDisplay : IDwinT5LDisplay, IDisposable
         for (ushort i = address; i < (ushort)(length + address); i += 120)
         {
             WriteVariablesRange(i, arr);
+        }
+    }
+    public void ChangeDisplayBaudRate(int baudRate, bool enableCrc = true, int retries = 5)
+    {
+        var divisor = 3225600 / baudRate;
+        divisor = Math.Clamp(divisor, 1, 0x150);
+
+        ushort configHigh = (ushort)(0x5A00 | (enableCrc ? 0x80 : 0x00));
+        ushort configLow = (ushort)divisor;
+
+        var success = false;
+
+        while (!success && retries-- > 0)
+        {
+            try
+            {
+                WriteVariablesRange(DwinDisplayConstants.UART2ConfigAddress, [configHigh, configLow]);
+                _serialPort.BaudRate = 3225600 / divisor;
+                success = true;
+            }
+            catch
+            {
+                Thread.Sleep(5);
+            }
+        }
+
+        if (!success)
+        {
+            throw new IOException("Failed to change display baud rate");
         }
     }
 

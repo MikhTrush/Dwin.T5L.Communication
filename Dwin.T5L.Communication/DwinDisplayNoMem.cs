@@ -204,6 +204,36 @@ public class DwinDisplayNoMem : IDwinT5LDisplay, IDisposable
         }
     }
 
+    public void ChangeDisplayBaudRate(int baudRate, bool enableCrc = true, int retries = 5)
+    {
+        var divisor = 3225600 / baudRate;
+        divisor = Math.Clamp(divisor, 1, 0x150);
+
+        ushort configHigh = (ushort)(0x5A00 | (enableCrc ? 0x80 : 0x00));
+        ushort configLow = (ushort)divisor;
+
+        var success = false;
+
+        while (!success && retries-- > 0)
+        {
+            try
+            {
+                WriteVariablesRange(DwinDisplayConstants.UART2ConfigAddress, [configHigh, configLow]);
+                _serialPort.BaudRate = 3225600 / divisor;
+                success = true;
+            }
+            catch
+            {
+                Thread.Sleep(5);
+            }
+        }
+
+        if (!success)
+        {
+            throw new IOException("Failed to change display baud rate");
+        }
+    }
+
     public void Dispose()
     {
         // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
