@@ -38,6 +38,7 @@ namespace Dwin.T5L.Communication
         public UInt16[] ReadVariablesRange(UInt16 address, byte length);
 
         public string ReadText(UInt16 address, byte length, Encoding? encoding = null);
-      
+
+        public void ChangeDisplayBaudRate(int baudRate, bool enableCrc = true, int retries = 3);
     }
 }
